@@ -3,9 +3,6 @@
 
 Transformer-based Financial Fraud Detection API with a lightweight Streamlit frontend.
 
-![GitHub Repo](https://img.shields.io/badge/Status-Production--Ready-green?style=flat-square)
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-sharukh--s-blue?logo=linkedin&style=flat-square)](https://www.linkedin.com/in/sharukh-s-4992b325a/)
 
 ---
 
