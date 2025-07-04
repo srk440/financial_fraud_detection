@@ -1,172 +1,182 @@
-```markdown
-# 💳 Financial Fraud Detection
 
-Transformer-based Financial Fraud Detection API with a lightweight Streamlit frontend.
+````markdown
+# 💸 Financial Fraud Detection
 
+**Transformer-based Financial Fraud Detection API with Streamlit Frontend**
 
----
+This project demonstrates a robust, end-to-end pipeline for detecting financial fraud using deep learning. It includes a Transformer-based classification model, REST API via FastAPI, and an interactive dashboard built with Streamlit.
 
-## 🧠 Overview
-
-This project leverages a custom **Transformer-based neural network** to detect **financial fraud** from transactional data. It is equipped with:
-
-- A deep transformer model with attention layers
-- Focal Loss for imbalance handling
-- Precision-Recall threshold optimization
-- Streamlit interface for real-time fraud prediction
+![Fraud Detection Banner](https://img.shields.io/badge/Made%20with-Transformers-00bcd4?style=for-the-badge) ![Status](https://img.shields.io/badge/Status-Production-green?style=for-the-badge)
 
 ---
 
-## 🚀 Features
+## 📁 Dataset
 
-- Transformer encoder stack with residuals and normalization
-- Trained with **class imbalance** using **Focal Loss**
-- Real-time API with FastAPI backend
-- Simple UI using Streamlit frontend
-- Threshold-tuned binary classification for fraud detection
+- **Source:** [Kaggle – Credit Card Fraud Detection](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud)
+- **Format:** `.xls` files (preprocessed and split)
+- **Files Included:**
+  - `X_train.xls`
+  - `y_train.xls`
+  - `X_test.xls`
+  - `y_test.xls`
+
+> *Note: The original dataset was converted to `.xls` format and split into training and test sets for convenience.*
 
 ---
 
-## 📁 Folder Structure
+## 🔄 Data Preprocessing
 
-```
+The following steps were applied in the `1_datac_collection_preprocess.py` and `scaler_generation.py` scripts:
 
-financial\_fraud\_detection/
-├── backend/
-│   ├── main.py
-│   ├── model/
-│   │   ├── transformer\_fraud\_model\_optimized.keras
-│   │   ├── scaler.pkl
-│   │   ├── focal\_loss.py
-├── frontend/
-│   ├── app.py
-├── preprocessed\_data/
-├── Data\_set/
-├── scaler\_genration.py
-├── train\_model.py
-├── request.py
-├── 1\_datac\_collection\_preprocess.py
-├── README.md
+1. **Loading raw `.xls` files** using `pandas`.
+2. **Handling missing values** (if any).
+3. **Feature scaling** using `StandardScaler`, saved as `scaler.pkl` for inference.
+4. **Imbalanced data handling** using **SMOTE** to oversample minority (fraud) class.
+5. **Train-test split** (80-20).
+6. Saved preprocessed data as `.xls` files for model training.
 
+---
+
+## 🤖 Model Architecture
+
+A **Transformer-based neural network** was built using `Keras` with the following components:
+
+- `Input Layer`: Shape `(1, 30)`
+- 3 Transformer blocks:
+  - Multi-Head Self Attention
+  - Residual Connections + Layer Normalization
+  - Feed Forward Network
+- `GlobalAveragePooling1D` → Dense Layers → Sigmoid Output
+
+**Loss Function:** Focal Loss  
+**Optimizer:** Adam  
+**Evaluation Metric:** ROC-AUC + Precision/Recall  
+**Output:** Binary classification (Fraud / Not Fraud)
+
+### ✅ Model Summary:
+- **Total Parameters:** `75,293`
+- **Trainable Params:** `75,293`
+- **Model Size:** ~294 KB
+
+---
+
+## 📈 Training Results
+
+| Epoch | Accuracy | Val Accuracy | Loss     | Val Loss  |
+|-------|----------|--------------|----------|-----------|
+| 1     | 96.93%   | 98.62%       | 0.0011   | 1.88e-4   |
+| 5     | 99.57%   | 99.82%       | 4.2e-5   | 2.27e-5   |
+| 10    | 99.70%   | **99.82%**   | 2.6e-5   | **1.87e-5** |
+
+### 📊 Evaluation (after threshold tuning at `0.894`):
+- **ROC AUC Score:** `0.9232`
+- **Classification Report**:
+  - **Precision (Fraud):** 0.77
+  - **Recall (Fraud):** 0.85
+  - **F1 Score (Fraud):** 0.81
+  - **Overall Accuracy:** 99.99%
+
+---
+
+## 🚀 Components
+
+### 1. 🧠 Model Training
+- File: `backend/model/model.py`
+- Saves model as:
+  - `transformer_fraud_model_optimized.h5`
+  - `transformer_fraud_model_optimized.keras`
+
+### 2. 🔌 Backend API (FastAPI)
+- Endpoint: `POST /predict`
+- Input: JSON with 30 feature values
+- Output: Predicted class + Fraud probability
+
+> Run with:
+```bash
+cd fraud_detector/backend
+uvicorn main:app --reload
 ````
 
----
+### 3. 🌐 Streamlit Frontend
 
-## 🛠️ Tech Stack
+* Path: `frontend/app.py`
+* Collects user input, sends to FastAPI, and displays result
 
-| Component     | Tool/Library     |
-|---------------|------------------|
-| Language      | Python 3.10+     |
-| ML Framework  | TensorFlow/Keras |
-| Backend API   | FastAPI          |
-| Frontend UI   | Streamlit        |
-| Data Handling | Pandas, NumPy    |
-
----
-
-## 🔬 Model Architecture
-
-- **Input**: (None, 1, 30)
-- **Transformer Layers**: 3 blocks with MultiHeadAttention, Add & Norm, FeedForward
-- **Pooling**: GlobalAveragePooling1D
-- **Final Dense Layers**: [64, 32, 1]
-- **Loss**: Focal Loss (γ = 2.0)
-- **Optimizer**: Adam
-- **Epochs**: 10
-
-```text
-Total Trainable Parameters: 75,293 (~294 KB)
-````
-
----
-
-## 📈 Model Performance
-
-### ✅ Training Results
-
-| Epoch | Accuracy | Loss      | Val Accuracy | Val Loss  |
-| ----- | -------- | --------- | ------------ | --------- |
-| 1     | 96.93%   | 0.0011    | 98.62%       | 0.0001877 |
-| 5     | 99.57%   | 0.0000421 | 99.82%       | 0.0000227 |
-| 10    | 99.70%   | 0.0000263 | 99.82%       | 0.0000187 |
-
-> ✅ Optimized with Best Threshold: `0.8941`
-
-### 🔍 Evaluation (Test Set)
-
-| Metric            | Value      |
-| ----------------- | ---------- |
-| Accuracy          | 99.99%     |
-| Precision (Fraud) | 77%        |
-| Recall (Fraud)    | 85%        |
-| F1 Score (Fraud)  | 81%        |
-| ROC AUC Score     | **0.9232** |
-
-> 🧠 Fraud samples: 98 | Non-Fraud: 56,864
-
----
-
-## 📦 Installation
+> Run with:
 
 ```bash
-# Backend
-cd backend/
-pip install -r requirements.txt
-uvicorn main:app --reload
-
-# Frontend
-cd ../frontend/
+cd fraud_detector/frontend
 streamlit run app.py
 ```
 
 ---
 
-## 📡 API Usage
+## 🗂 Directory Structure
 
-**POST** `/predict/`
-
-**Request JSON:**
-
-```json
-{
-  "features": [0.1, 0.2, ..., 0.05]  // 30 float features
-}
+```
+fraud_detector/
+├── backend/
+│   ├── main.py
+│   ├── model/
+│   │   ├── model.py
+│   │   ├── focal_loss.py
+│   │   ├── transformer_fraud_model_optimized.h5
+│   │   └── scaler.pkl
+├── frontend/
+│   └── app.py
+├── Data_set/
+│   ├── X_train.xls
+│   ├── y_train.xls
+│   ├── X_test.xls
+│   └── y_test.xls
+├── scaler_generation.py
+├── train_model.py
+├── request.py
+└── README.md
 ```
 
-**Response JSON:**
+---
 
-```json
-{
-  "prediction": 0,
-  "fraud_probability": 0.0517
-}
+## 🛠️ Setup Instructions
+
+```bash
+# Clone the repo
+git clone https://github.com/srk440/financial_fraud_detection.git
+cd financial_fraud_detection
+
+# (Optional) Create virtual environment
+python -m venv venv
+source venv/bin/activate  # or venv\Scripts\activate on Windows
+
+# Install backend dependencies
+cd backend
+pip install -r requirements.txt
+
+# Install frontend dependencies
+cd ../frontend
+pip install -r requirements.txt
 ```
 
 ---
 
 ## 👨‍💻 Author
 
-**Sharukh S.**
-
-* 🎓 B.Tech Artificial Intelligence & Data Science
-* 💼 Intern @ University Digital Marketing Team
-* 🔗 [LinkedIn Profile](https://www.linkedin.com/in/sharukh-s-4992b325a/)
+**Sharukh S**
+🔗 [LinkedIn Profile](https://www.linkedin.com/in/sharukh-s-4992b325a/)
 
 ---
 
-## 📄 License
+## 📌 License
 
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+This project is open-source and available under the [MIT License](LICENSE).
+
+---
+
+## ⭐ If you found this helpful, give the repo a star!
 
 ```
 
 ---
 
-Let me know if you'd like:
-- A `LICENSE` file (MIT/GPL/Apache?)
-- `.gitignore` optimized for Python + Streamlit
-- Deployment instructions (e.g. Hugging Face Spaces, Render)
-- Badges like CodeCov, Build Status, etc.
-
-Ready to push this to GitHub?
+Let me know if you'd like me to auto-create and upload this as a file (`README.md`) in your GitHub repo.
 ```
