@@ -1,117 +1,110 @@
-# 💳 Transformer-Based Financial Fraud Detection App
+ 💸 Financial Fraud Detection using Transformers
 
-A full-stack fraud detection system using **deep learning Transformers** for real-time credit card fraud detection. Built with:
-- ✅ TensorFlow (Keras)
-- ✅ FastAPI (for backend APIs)
-- ✅ Streamlit (for frontend dashboard)
-- ✅ SMOTE (for handling class imbalance)
-- ✅ Focal Loss (for better fraud classification)
-
----
-
-## 🚀 Features
-
-- Upload transaction data and get instant fraud predictions
-- Real-time inference using a Transformer model trained on the credit card fraud dataset
-- Interactive frontend (Streamlit) + scalable backend (FastAPI)
-- Optimized for class imbalance with SMOTE + Focal Loss
-- Supports `.keras`-based production deployment
+This project is a full-stack **AI-powered Fraud Detection System** that uses Transformer-based deep learning models to identify fraudulent financial transactions in real time. The backend is built using **FastAPI**, and a lightweight UI is available via **Streamlit**.
 
 ---
 
 ## 📁 Project Structure
 
 fraud_detector/
-├── backend/ ← FastAPI backend with ML model loading
-│ ├── main.py ← Handles API endpoints and model inference
-│ ├── transformer_fraud_model.keras ← Trained Transformer model
-│ └── requirements.txt
-│
-├── frontend/ ← Streamlit frontend for user interaction
-│ ├── app.py ← Streamlit UI script
-│ └── requirements.txt
-│
-├── model.py ← Model training script (Transformer)
-├── 1_datac_collection_preprocess.py ← Preprocessing & data cleaning
-├── README.md ← You're here!
-└── .gitignore
+├── backend/
+│ ├── main.py # FastAPI backend API
+│ ├── requirements.txt # Backend dependencies
+│ ├── model/
+│ │ ├── transformer_fraud_model_optimized.keras
+│ │ ├── scaler.pkl
+│ │ └── focal_loss.py
+├── frontend/
+│ ├── app.py # Streamlit frontend UI
+│ ├── requirements.txt
+├── preprocessed_data/ # Processed training data (CSV)
+├── 1_datac_collection_preprocess.py
+├── train_model.py # Training script for Transformer
+├── scaler_genration.py
+├── request.py # Testing API endpoint using requests
+└── README.md # This file
 
 ---
 
-## ⚙️ How to Run Locally
+## 🔍 Features
 
-### 1️⃣ Start Backend (FastAPI)
+- ✅ Transformer-based binary classifier (Fraud / Legit)
+- ✅ Real-time fraud prediction API using **FastAPI**
+- ✅ Frontend interface with **Streamlit**
+- ✅ Custom **Focal Loss** for imbalanced datasets
+- ✅ Scaler saved for consistent input preprocessing
+
+---
+
+## 🧠 Model Overview
+
+- **Input**: 30 numerical features from financial transaction records  
+- **Output**: Probability score & Fraud/Legit classification  
+- **Model Used**: Transformer with custom architecture  
+- **Loss Function**: Focal Loss (to handle class imbalance)
+
+---
+
+## 🚀 How to Run
+
+### 1️⃣ Backend API (FastAPI)
 ```bash
-cd fraud_detector/backend
-uvicorn main:app --reload
+cd fraud_detector
+uvicorn backend.main:app --reload
 
-2️⃣ Start Frontend (Streamlit)
-
+2️⃣ Frontend App (Streamlit)
 cd fraud_detector/frontend
 streamlit run app.py
 
-🌐 Deploy on Streamlit Cloud
-To deploy this app on Streamlit Community Cloud:
+📦 Dependencies
+Backend:
+	fastapi
+	uvicorn
+	tensorflow / keras
+	joblib
+	numpy
+Frontend:
+	streamlit
+	http
+Install them via:
+	pip install -r backend/requirements.txt
+	pip install -r frontend/requirements.txt
+API Endpoint
+	URL: POST /predict/
 
-✅ Step 1: Push to GitHub
-Push this folder to a public repository, e.g.:
-https://github.com/srk440/fraud-detection-app
+	Payload:
+		{
+		  "features": [0.1, -0.2, ..., 1.5]  // 30 float values
+		}
+
+	Response:
+		{
+		  "prediction": "Fraud",
+		  "fraud_probability": 0.9421,
+		  "threshold": 0.9123
+		}
+Model Details:
+	Input: 30 continuous features
+
+	Architecture: Custom Transformer block with dense layers
+
+	Loss Function: Focal Loss (for imbalance handling)
+
+	Output: Binary probability of fraud
+Status:
+✅ Model training complete
+✅ Real-time backend running
+✅ UI working with 30 feature inputs
+🔜 Flutter app integration (optional, paused)
+🔜 Deployment to Hugging Face / Render
+
+ Author
+Sharukh S
+AI & Data Science Enthusiast | Placement-focused 
 
 
+---
 
-✅ Step 2: Deploy on Streamlit
-Go to https://streamlit.io/cloud
+Let me know when you're ready to push this to GitHub — I can guide you step-by-step to commit, create the repo, push, and even publish on Hugging Face or Render!
 
-Click “New App”
-
-Connect your repo: srk440/fraud-detection-app
-
-Set the app path to:
-fraud_detector/frontend/app.py
-Click Deploy
-
-✅ Done!
-
-🧠 Model Details
-Dataset: Credit Card Fraud Detection (Kaggle)
-
-Input Features: 30 anonymized transaction features
-
-Model: Custom Transformer Encoder (3 layers)
-
-Optimizer: Adam
-
-Loss Function: Focal Loss (custom implementation)
-
-Evaluation Metrics: ROC AUC, Precision-Recall, F1-Score
-
-Data Handling: SMOTE for oversampling fraud class
-
-📦 Python Package Requirements
-📂 backend/requirements.txt
-
-fastapi
-uvicorn
-tensorflow
-pandas
-numpy
-scikit-learn
-imblearn
-
-📂 frontend/requirements.txt
-streamlit
-requests
-pandas
-numpy
-🤝 Credits
-Built with ❤️ by srk440
-
-Transformer architecture adapted for tabular fraud detection
-
-End-to-end deployment powered by Streamlit Cloud
-
-📬 Contact
-For collaborations or questions, feel free to connect:
-
-GitHub: srk440
 

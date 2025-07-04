@@ -1,62 +1,43 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[4]:
-
-
-# Step 1: Import Libraries
+# Step 1: Imports
+import os
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from imblearn.over_sampling import SMOTE
-import os
 
-# Step 2: Load the Dataset (Fixed File Path)
-file_path = r"D:\WORK\FRAUD DETECTION\DATA\creditcard.csv"  # Use raw string (r"")
-df = pd.read_csv(file_path)
+# Step 2: Define Base Path
+base_path = r"D:\WORK\FRAUD DETECTION\Data_set"
 
-# Step 3: Check for Missing Values
-print("Missing Values:\n", df.isnull().sum())
+# Step 3: Load Data
+X_train = pd.read_csv(os.path.join(base_path, "X_train.xls"))
+y_train = pd.read_csv(os.path.join(base_path, "y_train.xls"))
+X_test  = pd.read_csv(os.path.join(base_path, "X_test.xls"))
+y_test  = pd.read_csv(os.path.join(base_path, "y_test.xls"))
 
-# Step 4: Data Overview
-print(df.head())
-print("Class Distribution Before SMOTE:\n", df["Class"].value_counts())
+# If your files still have .xls extension but are really CSVs:
+# Replace ".csv" with ".xls" above—pd.read_csv will still work.
 
-# Step 5: Normalize Transaction Amount
+# Step 4: Check for Missing Values
+print("Missing in X_train:\n", X_train.isnull().sum())
+print("Missing in y_train:\n", y_train.isnull().sum())
+
+# Step 5: Standardize Features
 scaler = StandardScaler()
-df["Amount"] = scaler.fit_transform(df["Amount"].values.reshape(-1, 1))
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
 
-# Step 6: Define Features & Target
-X = df.drop(columns=["Class"])  # Features
-y = df["Class"]  # Target (Fraud / Non-Fraud)
-
-# Step 7: Split Data (Fixed Stratification)
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42, stratify=y
-)
-
-# Step 8: Handle Imbalanced Data with SMOTE
+# Step 6: Handle Class Imbalance (SMOTE)
 smote = SMOTE(random_state=42)
-X_train_resampled, y_train_resampled = smote.fit_resample(X_train, y_train)
+X_train_resampled, y_train_resampled = smote.fit_resample(X_train_scaled, y_train)
 
-# Step 9: Check Class Balance After SMOTE
-print("Class Distribution After SMOTE:\n", pd.Series(y_train_resampled).value_counts())
+# Step 7: Save Preprocessed Data Locally
+out_dir = r"D:\WORK\FRAUD DETECTION\preprocessed_data"
+os.makedirs(out_dir, exist_ok=True)
 
-# Step 10: Save Preprocessed Data
-os.makedirs("preprocessed_data", exist_ok=True)  # Create folder if not exists
-X_train_resampled.to_csv("preprocessed_data/X_train.csv", index=False)
-y_train_resampled.to_csv("preprocessed_data/y_train.csv", index=False)
-X_test.to_csv("preprocessed_data/X_test.csv", index=False)
-y_test.to_csv("preprocessed_data/y_test.csv", index=False)
+pd.DataFrame(X_train_resampled).to_csv(os.path.join(out_dir, "X_train_pre.csv"), index=False)
+pd.DataFrame(y_train_resampled).to_csv(os.path.join(out_dir, "y_train_pre.csv"), index=False)
+pd.DataFrame(X_test_scaled).to_csv(os.path.join(out_dir, "X_test_pre.csv"), index=False)
+y_test.to_csv(os.path.join(out_dir, "y_test_pre.csv"), index=False)
 
-print(" Data Preprocessing Complete! Ready for Model Training ")
-
-
-# In[ ]:
-
-
-
-
+print(" Data preprocessing is completed!")
+print("Files saved to:", out_dir)
