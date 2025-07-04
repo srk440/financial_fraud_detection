@@ -52,7 +52,7 @@ fraud_detector/
 cd fraud_detector
 uvicorn backend.main:app --reload
 
-###2️⃣ Frontend App (Streamlit)
+ 2️⃣ Frontend App (Streamlit)
 ```bash
 cd fraud_detector/frontend
 streamlit run app.py
